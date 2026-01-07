@@ -1,4 +1,4 @@
-import type { RevalidateEntity } from '@supabase/stripe-sync-engine'
+import type { RevalidateEntity } from '@pretzelai/stripe-sync-engine'
 import { config } from 'dotenv'
 import type { ConnectionOptions } from 'node:tls'
 

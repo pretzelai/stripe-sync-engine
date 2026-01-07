@@ -1,6 +1,6 @@
-import { StripeSync } from '@supabase/stripe-sync-engine'
+import { StripeSync } from '@pretzelai/stripe-sync-engine'
 import { vitest, beforeAll, describe, test, expect, afterEach } from 'vitest'
-import { runMigrations } from '@supabase/stripe-sync-engine'
+import { runMigrations } from '@pretzelai/stripe-sync-engine'
 import { getConfig } from '../utils/config'
 import { mockStripe } from './helpers/mockStripe'
 import { logger } from '../logger'

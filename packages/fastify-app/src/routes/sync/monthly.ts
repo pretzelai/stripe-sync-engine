@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { verifyApiKey } from '../../utils/verifyApiKey'
-import { SyncBackfillParams } from '@supabase/stripe-sync-engine'
+import { SyncBackfillParams } from '@pretzelai/stripe-sync-engine'
 
 export default async function routes(fastify: FastifyInstance) {
   fastify.post('/monthly', {

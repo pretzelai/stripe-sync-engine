@@ -57,7 +57,7 @@ importers:
       '@fastify/swagger':
         specifier: ^9.5.1
         version: 9.6.1
-      '@supabase/stripe-sync-engine':
+      '@pretzelai/stripe-sync-engine':
         specifier: 'workspace:'
         version: link:../sync-engine
       dotenv:
