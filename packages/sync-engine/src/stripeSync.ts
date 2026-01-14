@@ -1510,15 +1510,24 @@ export class StripeSync {
 
   async fillCheckoutSessionsLineItems(checkoutSessionIds: string[], syncTimestamp?: string) {
     for (const checkoutSessionId of checkoutSessionIds) {
-      const lineItemResponses: Stripe.LineItem[] = []
+      try {
+        const lineItemResponses: Stripe.LineItem[] = []
 
-      for await (const lineItem of this.stripe.checkout.sessions.listLineItems(checkoutSessionId, {
-        limit: 100,
-      })) {
-        lineItemResponses.push(lineItem)
+        for await (const lineItem of this.stripe.checkout.sessions.listLineItems(checkoutSessionId, {
+          limit: 100,
+        })) {
+          lineItemResponses.push(lineItem)
+        }
+
+        await this.upsertCheckoutSessionLineItems(lineItemResponses, checkoutSessionId, syncTimestamp)
+      } catch (err) {
+        // Some checkout sessions (e.g., old test mode sessions, incomplete sessions)
+        // don't have line item data available. Log and continue with other sessions.
+        this.config.logger?.warn(
+          { checkoutSessionId, error: err instanceof Error ? err.message : String(err) },
+          'Failed to fetch line items for checkout session, skipping'
+        )
       }
-
-      await this.upsertCheckoutSessionLineItems(lineItemResponses, checkoutSessionId, syncTimestamp)
     }
   }
 

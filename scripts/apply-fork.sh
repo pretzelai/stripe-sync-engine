@@ -8,7 +8,11 @@ set -e
 # 1. Removes "alter function owner to postgres" from migration (works with any Postgres, not just Supabase)
 # 2. Renames package from @supabase to @pretzelai
 # 3. Updates all internal references
-# 4. Builds the package
+# 4. Applies custom patches from scripts/patches/
+# 5. Builds the package
+#
+# To add new patches:
+#   Create a .patch file in scripts/patches/ using: git diff > scripts/patches/my-fix.patch
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -47,12 +51,27 @@ NPMRC_FILE="$ROOT_DIR/.npmrc"
 echo "==> Cleaning .npmrc..."
 echo "" > "$NPMRC_FILE"
 
-# 7. Install dependencies (re-link workspace packages)
+# 7. Apply patches (custom fixes for our fork)
+PATCHES_DIR="$SCRIPT_DIR/patches"
+if [ -d "$PATCHES_DIR" ]; then
+    echo "==> Applying patches..."
+    for patch in "$PATCHES_DIR"/*.patch; do
+        if [ -f "$patch" ]; then
+            echo "    Applying $(basename "$patch")..."
+            # Use -N to skip already applied patches, --ignore-whitespace for flexibility
+            git apply --ignore-whitespace "$patch" 2>/dev/null || {
+                echo "    (patch already applied or doesn't match, skipping)"
+            }
+        fi
+    done
+fi
+
+# 8. Install dependencies (re-link workspace packages)
 echo "==> Installing dependencies..."
 cd "$ROOT_DIR"
 pnpm install
 
-# 8. Build
+# 9. Build
 echo "==> Building..."
 pnpm run build
 

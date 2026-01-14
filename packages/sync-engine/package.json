@@ -1,6 +1,6 @@
 {
   "name": "@pretzelai/stripe-sync-engine",
-  "version": "0.48.1",
+  "version": "0.48.2",
   "private": false,
   "description": "Stripe Sync Engine to sync Stripe data based on webhooks to Postgres",
   "type": "module",
