@@ -1,0 +1,26 @@
+diff --git a/packages/sync-engine/src/stripeSync.ts b/packages/sync-engine/src/stripeSync.ts
+index 47ad355..7b3e18d 100644
+--- a/packages/sync-engine/src/stripeSync.ts
++++ b/packages/sync-engine/src/stripeSync.ts
+@@ -1628,6 +1628,21 @@ export class StripeSync {
+       this.stripe.subscriptionItems.list({ subscription: id, limit: 100 })
+     )
+ 
++    // Stripe webhook events sometimes don't include current_period_start/end at the
++    // subscription level, only at the item level. Extract from first item if missing.
++    for (const sub of subscriptions) {
++      const firstItem = sub.items?.data?.[0]
++      if (firstItem) {
++        const subAny = sub as any
++        if (subAny.current_period_start === undefined && firstItem.current_period_start !== undefined) {
++          subAny.current_period_start = firstItem.current_period_start
++        }
++        if (subAny.current_period_end === undefined && firstItem.current_period_end !== undefined) {
++          subAny.current_period_end = firstItem.current_period_end
++        }
++      }
++    }
++
+     // Run it
+     const rows = await this.postgresClient.upsertManyWithTimestampProtection(
+       subscriptions,
